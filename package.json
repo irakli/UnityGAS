@@ -1,11 +1,14 @@
 {
   "name": "com.sjai013.abilitysystem",
   "displayName": "Gameplay Ability System",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "2020.1",
   "description": "A unified framework for developing ability-based games",
-  "dependencies": {},
+  "license": "MIT",
+  "dependencies": {
+    "com.cysharp.unitask": "2.3.1"
+  },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@sjai013"
+    "registry": "https://npm.pkg.github.com/@irakli"
   }
 }
