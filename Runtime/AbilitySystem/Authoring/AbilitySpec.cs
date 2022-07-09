@@ -74,7 +74,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
         /// <summary>
         /// Cancels the ability, if it is active
         /// </summary>
-        public abstract void CancelAbility();
+        public abstract void Cancel();
 
         /// <summary>
         /// Checks if Gameplay Tag requirements allow activating this ability
@@ -125,7 +125,6 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
                 }
             }
 
-            Debug.Log(longestCooldown);
             return new AbilityCooldownTime()
             {
                 TimeRemaining = longestCooldown,
@@ -134,12 +133,12 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
         }
 
         /// <summary>
-        /// Method to activate before activating this ability.  This method is run after activation checks.
+        /// Method to activate before activating this ability. This method is run after activation checks.
         /// </summary>
         protected abstract UniTask PreStart();
 
         /// <summary>
-        /// The logic that dictates what the ability does.  Targetting logic should be placed here.
+        /// The logic that dictates what the ability does. Targeting logic should be placed here.
         /// Gameplay Effects are applied in this method.
         /// </summary>
         /// <returns></returns>
@@ -160,7 +159,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
         public bool SatisfiesCost()
         {
             if (Ability.cost == null) return true;
-            
+
             var spec = Owner.MakeOutgoingSpec(Ability.cost, Level);
             // If this isn't an instant cost, then assume it passes cooldown check
             if (spec.GameplayEffect.DefinitionContainer.DurationPolicy != DurationPolicy.Instant) return true;

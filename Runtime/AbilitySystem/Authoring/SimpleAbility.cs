@@ -43,7 +43,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
             /// <summary>
             /// What to do when the ability is cancelled.  We don't care about there for this example.
             /// </summary>
-            public override void CancelAbility() { }
+            public override void Cancel() { }
 
             /// <summary>
             /// What happens when we activate the ability.

@@ -25,7 +25,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
             {
             }
 
-            public override void CancelAbility()
+            public override void Cancel()
             {
             }
 
