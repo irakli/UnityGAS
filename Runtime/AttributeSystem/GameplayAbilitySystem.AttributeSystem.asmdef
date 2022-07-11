@@ -1,5 +1,5 @@
 {
-    "name": "AttributeSystem",
+    "name": "GameplayAbilitySystem.AttributeSystem",
     "rootNamespace": "GameplayAbilitySystem",
     "references": [],
     "includePlatforms": [],

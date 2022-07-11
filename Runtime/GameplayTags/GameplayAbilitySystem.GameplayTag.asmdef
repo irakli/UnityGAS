@@ -1,5 +1,5 @@
 {
-    "name": "GameplayTags",
+    "name": "GameplayAbilitySystem.GameplayTag",
     "rootNamespace": "GameplayAbilitySystem",
     "references": [],
     "includePlatforms": [],
