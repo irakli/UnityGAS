@@ -13,80 +13,81 @@ namespace GameplayAbilitySystem.AbilitySystem
         /// </summary>
         public GameplayEffect GameplayEffect { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public float DurationRemaining { get; private set; }
-
         public float TotalDuration { get; private set; }
-        public GameplayEffectPeriod PeriodDefinition { get; private set; }
         public float TimeUntilPeriodTick { get; private set; }
         public float Level { get; private set; }
+        
         public AbilitySystemCharacter Source { get; private set; }
         public AbilitySystemCharacter Target { get; private set; }
         public AttributeValue? SourceCapturedAttribute = null;
+        public GameplayEffectPeriod PeriodDefinition { get; private set; }
 
-        public static GameplayEffectSpec CreateNew(GameplayEffect GameplayEffect, AbilitySystemCharacter Source, float Level = 1)
+        public static GameplayEffectSpec CreateNew(GameplayEffect gameplayEffect, AbilitySystemCharacter source,
+            float level = 1)
         {
-            return new GameplayEffectSpec(GameplayEffect, Source, Level);
+            return new GameplayEffectSpec(gameplayEffect, source, level);
         }
 
-        private GameplayEffectSpec(GameplayEffect GameplayEffect, AbilitySystemCharacter Source, float Level = 1)
+        private GameplayEffectSpec(GameplayEffect gameplayEffect, AbilitySystemCharacter source, float level = 1)
         {
-            this.GameplayEffect = GameplayEffect;
-            this.Source = Source;
-            for (var i = 0; i < this.GameplayEffect.DefinitionContainer.Modifiers.Length; i++)
+            GameplayEffect = gameplayEffect;
+            Source = source;
+            for (var i = 0; i < GameplayEffect.DefinitionContainer.Modifiers.Length; i++)
             {
-                this.GameplayEffect.DefinitionContainer.Modifiers[i].ModifierMagnitude.Initialize(this);
-            }
-            this.Level = Level;
-            if (this.GameplayEffect.DefinitionContainer.DurationModifier)
-            {
-                this.DurationRemaining = this.GameplayEffect.DefinitionContainer.DurationModifier.CalculateMagnitude(this).GetValueOrDefault() * this.GameplayEffect.DefinitionContainer.DurationMultiplier;
-                this.TotalDuration = this.DurationRemaining;
+                GameplayEffect.DefinitionContainer.Modifiers[i].ModifierMagnitude.Initialize(this);
             }
 
-            this.TimeUntilPeriodTick = this.GameplayEffect.Period.Period;
-            // By setting the time to 0, we make sure it gets executed at first opportunity
-            if (this.GameplayEffect.Period.ExecuteOnApplication)
+            Level = level;
+            if (GameplayEffect.DefinitionContainer.DurationModifier)
             {
-                this.TimeUntilPeriodTick = 0;
+                DurationRemaining =
+                    GameplayEffect.DefinitionContainer.DurationModifier.CalculateMagnitude(this)
+                        .GetValueOrDefault() * GameplayEffect.DefinitionContainer.DurationMultiplier;
+                TotalDuration = DurationRemaining;
+            }
+
+            TimeUntilPeriodTick = GameplayEffect.Period.Period;
+            // By setting the time to 0, we make sure it gets executed at first opportunity
+            if (GameplayEffect.Period.ExecuteOnApplication)
+            {
+                TimeUntilPeriodTick = 0;
             }
         }
 
         public GameplayEffectSpec SetTarget(AbilitySystemCharacter target)
         {
-            this.Target = target;
+            Target = target;
             return this;
         }
 
         public void SetTotalDuration(float totalDuration)
         {
-            this.TotalDuration = totalDuration;
+            TotalDuration = totalDuration;
         }
 
         public GameplayEffectSpec SetDuration(float duration)
         {
-            this.DurationRemaining = duration;
+            DurationRemaining = duration;
             return this;
         }
 
         public GameplayEffectSpec UpdateRemainingDuration(float deltaTime)
         {
-            this.DurationRemaining -= deltaTime;
+            DurationRemaining -= deltaTime;
             return this;
         }
 
         public GameplayEffectSpec TickPeriodic(float deltaTime, out bool executePeriodicTick)
         {
-            this.TimeUntilPeriodTick -= deltaTime;
+            TimeUntilPeriodTick -= deltaTime;
             executePeriodicTick = false;
-            if (this.TimeUntilPeriodTick <= 0)
+            if (TimeUntilPeriodTick <= 0)
             {
-                this.TimeUntilPeriodTick = this.GameplayEffect.Period.Period;
+                TimeUntilPeriodTick = GameplayEffect.Period.Period;
 
                 // Check to make sure period is valid, otherwise we'd just end up executing every frame
-                if (this.GameplayEffect.Period.Period > 0)
+                if (GameplayEffect.Period.Period > 0)
                 {
                     executePeriodicTick = true;
                 }
@@ -97,10 +98,8 @@ namespace GameplayAbilitySystem.AbilitySystem
 
         public GameplayEffectSpec SetLevel(float level)
         {
-            this.Level = level;
+            Level = level;
             return this;
         }
-
     }
-
 }

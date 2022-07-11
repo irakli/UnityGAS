@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace GameplayAbilitySystem.AttributeSystem.Components
 {
-
     /// <summary>
     /// Manages the attributes for a game character
     /// </summary>

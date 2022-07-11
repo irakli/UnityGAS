@@ -61,9 +61,9 @@ namespace GameplayAbilitySystem.AbilitySystem.Components
         {
             level = level ?? Level;
             return GameplayEffectSpec.CreateNew(
-                GameplayEffect: GameplayEffect,
-                Source: this,
-                Level: level.GetValueOrDefault(1));
+                gameplayEffect: GameplayEffect,
+                source: this,
+                level: level.GetValueOrDefault(1));
         }
 
         private bool SatisfiesRequirements(GameplayEffectSpec spec)
