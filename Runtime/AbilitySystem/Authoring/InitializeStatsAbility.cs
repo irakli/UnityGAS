@@ -9,7 +9,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
     {
         [field: SerializeField] public GameplayEffect[] GameplayEffect { get; set; }
 
-        public override AbilitySpec CreateSpec(AbilitySystemCharacter owner)
+        public override AbilitySpec CreateSpec(AbilitySystemCharacter owner, AbilitySystemCharacter target = null)
         {
             var spec = new InitializeStatsAbilitySpec(this, owner)
             {

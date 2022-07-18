@@ -20,8 +20,9 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
         /// Creates the Ability Spec, which is instantiated for each character.
         /// </summary>
         /// <param name="owner"></param>
+        /// <param name="target"></param>
         /// <returns></returns>
-        public override AbilitySpec CreateSpec(AbilitySystemCharacter owner)
+        public override AbilitySpec CreateSpec(AbilitySystemCharacter owner, AbilitySystemCharacter target = null)
         {
             var spec = new SimpleAbilitySpec(this, owner)
             {

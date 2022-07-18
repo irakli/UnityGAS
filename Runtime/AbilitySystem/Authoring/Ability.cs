@@ -31,7 +31,8 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
         /// Creates the Ability Spec (the instantiation of the ability)
         /// </summary>
         /// <param name="owner">Usually the character casting this ability</param>
+        /// <param name="target">Usually the character receiving this ability</param>
         /// <returns>Ability Spec</returns>
-        public abstract AbilitySpec CreateSpec(AbilitySystemCharacter owner);
+        public abstract AbilitySpec CreateSpec(AbilitySystemCharacter owner, AbilitySystemCharacter target = null);
     }
 }

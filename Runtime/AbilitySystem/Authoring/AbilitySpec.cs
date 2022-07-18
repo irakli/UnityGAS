@@ -23,7 +23,12 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
         /// The owner of the AbilitySpec - usually the source
         /// </summary>
         protected AbilitySystemCharacter Owner { get; set; }
-
+        
+        /// <summary>
+        /// The target of the AbilitySpec
+        /// </summary>
+        protected AbilitySystemCharacter Target { get; set; }
+        
         /// <summary>
         /// Ability level
         /// </summary>
@@ -39,10 +44,12 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
         /// </summary>
         /// <param name="ability">Ability</param>
         /// <param name="owner">Owner - usually the character activating the ability</param>
-        public AbilitySpec(Ability ability, AbilitySystemCharacter owner)
+        /// <param name="target">Target - usually the character receiving the ability</param>
+        public AbilitySpec(Ability ability, AbilitySystemCharacter owner, AbilitySystemCharacter target = null)
         {
             Ability = ability;
             Owner = owner;
+            Target = target;
         }
 
         /// <summary>

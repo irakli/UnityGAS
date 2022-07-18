@@ -171,6 +171,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Components
 
         private void TickGameplayEffects()
         {
+            // TODO: Remove expired GEs
             foreach (var container in AppliedGameplayEffects)
             {
                 var spec = container.Spec;
