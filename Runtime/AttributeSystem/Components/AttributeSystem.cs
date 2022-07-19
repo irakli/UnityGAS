@@ -1,35 +1,42 @@
+using System;
 using System.Collections.Generic;
-using GameplayAbilitySystem.AttributeSystem.Authoring;
 using UnityEngine;
+using Attribute = GameplayAbilitySystem.AttributeSystem.Authoring.Attribute;
 
 namespace GameplayAbilitySystem.AttributeSystem.Components
 {
     /// <summary>
     /// Manages the attributes for a game character
     /// </summary>
-    public class AttributeSystemComponent : MonoBehaviour
+    public class AttributeSystem : MonoBehaviour
     {
-        [SerializeField]
-        private AbstractAttributeEventHandler[] AttributeSystemEvents;
+        public class AttributeChangeEventArgs : EventArgs
+        {
+            public Attribute Attribute { get; set; }
+            public float CurrentValue { get; set; }
+            public float PreviousValue { get; set; }
+        }
+
+        public event EventHandler<AttributeChangeEventArgs> AttributeChanged;
+
+        [SerializeField] private AbstractAttributeEventHandler[] attributeSystemEvents;
 
         /// <summary>
         /// Attribute sets assigned to the game character
         /// </summary>
-        [SerializeField]
-        private List<Attribute> Attributes;
+        [SerializeField] private List<Attribute> attributes;
 
-        [SerializeField]
-        private List<AttributeValue> AttributeValues;
+        [SerializeField] private List<AttributeValue> attributeValues;
 
-        private bool mAttributeDictStale;
-        public Dictionary<Attribute, int> mAttributeIndexCache { get; private set; } = new Dictionary<Attribute, int>();
+        private bool _isAttributeDictStale;
+        public Dictionary<Attribute, int> AttributeIndexCache { get; } = new();
 
         /// <summary>
         /// Marks attribute cache dirty, so it can be recreated next time it is required
         /// </summary>
         public void MarkAttributesDirty()
         {
-            this.mAttributeDictStale = true;
+            _isAttributeDictStale = true;
         }
 
         /// <summary>
@@ -44,15 +51,13 @@ namespace GameplayAbilitySystem.AttributeSystem.Components
             // If dictionary is stale, rebuild it
             var attributeCache = GetAttributeCache();
 
-
             // We use a cache to store the index of the attribute in the list, so we don't
             // have to iterate through it every time
             if (attributeCache.TryGetValue(attribute, out var index))
             {
-                value = AttributeValues[index];
+                value = attributeValues[index];
                 return true;
             }
-
 
             // No matching attribute found
             value = new AttributeValue();
@@ -64,9 +69,10 @@ namespace GameplayAbilitySystem.AttributeSystem.Components
             // If dictionary is stale, rebuild it
             var attributeCache = GetAttributeCache();
             if (!attributeCache.TryGetValue(attribute, out var index)) return;
-            var attributeValue = AttributeValues[index];
+
+            var attributeValue = attributeValues[index];
             attributeValue.BaseValue = value;
-            AttributeValues[index] = attributeValue;
+            attributeValues[index] = attributeValue;
         }
 
         /// <summary>
@@ -74,7 +80,7 @@ namespace GameplayAbilitySystem.AttributeSystem.Components
         /// does not modify the original attribute
         /// </summary>
         /// <param name="attribute">Attribute to set</param>
-        /// <param name="modifierType">How to modify the attribute</param>
+        /// <param name="modifier">How to modify the attribute</param>
         /// <param name="value">Copy of newly modified attribute</param>
         /// <returns>True, if attribute was found.</returns>
         public bool UpdateAttributeModifiers(Attribute attribute, AttributeModifier modifier, out AttributeValue value)
@@ -87,11 +93,11 @@ namespace GameplayAbilitySystem.AttributeSystem.Components
             if (attributeCache.TryGetValue(attribute, out var index))
             {
                 // Get a copy of the attribute value struct
-                value = AttributeValues[index];
+                value = attributeValues[index];
                 value.Modifier = value.Modifier.Combine(modifier);
 
                 // Structs are copied by value, so the modified attribute needs to be reassigned to the array
-                AttributeValues[index] = value;
+                attributeValues[index] = value;
                 return true;
             }
 
@@ -116,8 +122,8 @@ namespace GameplayAbilitySystem.AttributeSystem.Components
                     continue;
                 }
 
-                this.Attributes.Add(attributes[i]);
-                attributeCache.Add(attributes[i], this.Attributes.Count - 1);
+                this.attributes.Add(attributes[i]);
+                attributeCache.Add(attributes[i], this.attributes.Count - 1);
             }
         }
 
@@ -129,7 +135,7 @@ namespace GameplayAbilitySystem.AttributeSystem.Components
         {
             for (var i = 0; i < attributes.Length; i++)
             {
-                this.Attributes.Remove(attributes[i]);
+                this.attributes.Remove(attributes[i]);
             }
 
             // Update attribute cache
@@ -138,78 +144,94 @@ namespace GameplayAbilitySystem.AttributeSystem.Components
 
         public void ResetAll()
         {
-            for (var i = 0; i < this.AttributeValues.Count; i++)
+            for (var i = 0; i < attributeValues.Count; i++)
             {
-                var defaultAttribute = new AttributeValue();
-                defaultAttribute.Attribute = this.AttributeValues[i].Attribute;
-                this.AttributeValues[i] = defaultAttribute;
+                var defaultAttribute = new AttributeValue
+                {
+                    Attribute = attributeValues[i].Attribute
+                };
+                attributeValues[i] = defaultAttribute;
             }
         }
 
         public void ResetAttributeModifiers()
         {
-            for (var i = 0; i < this.AttributeValues.Count; i++)
+            for (var i = 0; i < attributeValues.Count; i++)
             {
-                var attributeValue = this.AttributeValues[i];
+                var attributeValue = attributeValues[i];
                 attributeValue.Modifier = default;
-                this.AttributeValues[i] = attributeValue;
+                attributeValues[i] = attributeValue;
             }
         }
 
-        private void InitialiseAttributeValues()
+        private void InitializeAttributeValues()
         {
-            this.AttributeValues = new List<AttributeValue>();
-            for (var i = 0; i < Attributes.Count; i++)
+            attributeValues = new List<AttributeValue>();
+            foreach (var attribute in attributes)
             {
-                this.AttributeValues.Add(new AttributeValue()
-                {
-                    Attribute = this.Attributes[i],
-                    Modifier = new AttributeModifier()
+                attributeValues.Add(new AttributeValue
                     {
-                        Add = 0f,
-                        Multiply = 0f,
-                        Override = 0f
+                        Attribute = attribute,
+                        Modifier = new AttributeModifier
+                        {
+                            Add = 0f,
+                            Multiply = 0f,
+                            Override = 0f
+                        }
                     }
-                }
                 );
             }
         }
 
-        private List<AttributeValue> prevAttributeValues = new List<AttributeValue>();
+        private readonly List<AttributeValue> _previousAttributeValues = new();
+
         public void UpdateAttributeCurrentValues()
         {
-            prevAttributeValues.Clear();
-            for (var i = 0; i < this.AttributeValues.Count; i++)
+            _previousAttributeValues.Clear();
+            for (var i = 0; i < attributeValues.Count; i++)
             {
-                var _attribute = this.AttributeValues[i];
-                prevAttributeValues.Add(_attribute);
-                this.AttributeValues[i] = _attribute.Attribute.CalculateCurrentAttributeValue(_attribute, this.AttributeValues);
+                var attribute = attributeValues[i];
+                _previousAttributeValues.Add(attribute);
+                attributeValues[i] =
+                    attribute.Attribute.CalculateCurrentValue(attribute, attributeValues);
+
+                if (attributeValues[i].CurrentValue != _previousAttributeValues[i].CurrentValue)
+                {
+                    AttributeChanged?.Invoke(this, new AttributeChangeEventArgs()
+                    {
+                        Attribute = attributes[i],
+                        CurrentValue = attributeValues[i].CurrentValue,
+                        PreviousValue = _previousAttributeValues[i].CurrentValue
+                    });
+                }
             }
 
-            for (var i = 0; i < this.AttributeSystemEvents.Length; i++)
+            for (var i = 0; i < attributeSystemEvents.Length; i++)
             {
-                this.AttributeSystemEvents[i].PreAttributeChange(this, prevAttributeValues, ref this.AttributeValues);
+                attributeSystemEvents[i].PreAttributeChange(this, _previousAttributeValues, ref attributeValues);
             }
         }
 
         private Dictionary<Attribute, int> GetAttributeCache()
         {
-            if (mAttributeDictStale)
+            if (_isAttributeDictStale)
             {
-                mAttributeIndexCache.Clear();
-                for (var i = 0; i < AttributeValues.Count; i++)
+                AttributeIndexCache.Clear();
+                for (var i = 0; i < attributeValues.Count; i++)
                 {
-                    mAttributeIndexCache.Add(AttributeValues[i].Attribute, i);
+                    AttributeIndexCache.Add(attributeValues[i].Attribute, i);
                 }
-                this.mAttributeDictStale = false;
+
+                _isAttributeDictStale = false;
             }
-            return mAttributeIndexCache;
+
+            return AttributeIndexCache;
         }
 
         private void Awake()
         {
-            InitialiseAttributeValues();
-            this.MarkAttributesDirty();
+            InitializeAttributeValues();
+            MarkAttributesDirty();
             GetAttributeCache();
         }
 
@@ -217,8 +239,5 @@ namespace GameplayAbilitySystem.AttributeSystem.Components
         {
             UpdateAttributeCurrentValues();
         }
-
-
     }
-
 }

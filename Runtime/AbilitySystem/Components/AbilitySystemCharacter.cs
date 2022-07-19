@@ -9,7 +9,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Components
 {
     public class AbilitySystemCharacter : MonoBehaviour
     {
-        [field: SerializeField] public AttributeSystemComponent AttributeSystem { get; set; }
+        [field: SerializeField] public AttributeSystem.Components.AttributeSystem AttributeSystem { get; set; }
         [field: SerializeField] public float Level { get; set; }
 
         public readonly List<GameplayEffectContainer> AppliedGameplayEffects = new();

@@ -40,7 +40,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
                 return default;
             }
 
-            protected override UniTask Start()
+            protected override UniTask<bool> Start()
             {
                 // Apply cost and cooldown (if any)
                 if (Ability.cooldown)

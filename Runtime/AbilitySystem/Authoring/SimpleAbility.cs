@@ -53,7 +53,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
             /// gameplay effect
             /// </summary>
             /// <returns></returns>
-            protected override UniTask Start()
+            protected override UniTask<bool> Start()
             {
                 // Apply cost and cooldown
                 var cooldownSpec = Owner.MakeOutgoingSpec(Ability.cooldown);

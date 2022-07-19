@@ -56,21 +56,23 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
         /// Try activating the ability.
         /// </summary>
         /// <returns></returns>
-        public async UniTask TryStart()
+        public async UniTask<bool> TryStart()
         {
-            if (!CanActivateAbility()) return;
+            if (!CanStart()) return false;
 
             IsActive = true;
             await PreStart();
-            await Start();
+            var result = await Start();
             End();
+
+            return result;
         }
 
         /// <summary>
         /// Checks if this ability can be activated
         /// </summary>
         /// <returns></returns>
-        public bool CanActivateAbility()
+        public bool CanStart()
         {
             return !IsActive
                    && SatisfiesGameplayTags()
@@ -149,7 +151,7 @@ namespace GameplayAbilitySystem.AbilitySystem.Authoring
         /// Gameplay Effects are applied in this method.
         /// </summary>
         /// <returns></returns>
-        protected abstract UniTask Start();
+        protected abstract UniTask<bool> Start();
 
         /// <summary>
         /// Method to run once the ability ends

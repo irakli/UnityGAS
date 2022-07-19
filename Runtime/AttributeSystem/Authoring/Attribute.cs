@@ -5,12 +5,6 @@ using UnityEngine;
 
 namespace GameplayAbilitySystem.AttributeSystem.Authoring
 {
-    public abstract class PreAttributeChangeEventArgs : EventArgs
-    {
-        public AttributeSystemComponent AttributeSystem { get; set; }
-        public float Value { get; set; }
-    }
-
     /// <summary>
     /// This asset defines a single player attribute
     /// </summary>
@@ -22,21 +16,13 @@ namespace GameplayAbilitySystem.AttributeSystem.Authoring
         /// </summary>
         [field: SerializeField] public string Name { get; set; }
 
-        public event EventHandler PreAttributeChange;
-
-        public void OnPreAttributeChange(object sender, PreAttributeChangeEventArgs e)
-        {
-            var handler = PreAttributeChange;
-            PreAttributeChange?.Invoke(sender, e);
-        }
-
         public AttributeValue CalculateInitialValue(AttributeValue attributeValue,
             List<AttributeValue> otherAttributeValues)
         {
             return attributeValue;
         }
 
-        public virtual AttributeValue CalculateCurrentAttributeValue(AttributeValue attributeValue,
+        public virtual AttributeValue CalculateCurrentValue(AttributeValue attributeValue,
             List<AttributeValue> otherAttributeValues)
         {
             attributeValue.CurrentValue = (attributeValue.BaseValue + attributeValue.Modifier.Add) *
