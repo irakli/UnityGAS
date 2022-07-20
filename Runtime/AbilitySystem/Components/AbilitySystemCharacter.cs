@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using GameplayAbilitySystem.AbilitySystem.Authoring;
 using GameplayAbilitySystem.AttributeSystem.Authoring;
-using GameplayAbilitySystem.AttributeSystem.Components;
 using GameplayAbilitySystem.GameplayTags.Authoring;
 using UnityEngine;
 

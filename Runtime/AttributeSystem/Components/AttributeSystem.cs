@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Attribute = GameplayAbilitySystem.AttributeSystem.Authoring.Attribute;
 
@@ -166,8 +167,7 @@ namespace GameplayAbilitySystem.AttributeSystem.Components
 
         private void InitializeAttributeValues()
         {
-            attributeValues = new List<AttributeValue>();
-            foreach (var attribute in attributes)
+            foreach (var attribute in attributes.Where(attribute => attributeValues.All(a => a.Attribute != attribute)))
             {
                 attributeValues.Add(new AttributeValue
                     {
